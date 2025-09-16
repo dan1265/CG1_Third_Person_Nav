@@ -17,7 +17,12 @@ public class PlayerMovement : MonoBehaviour
         cameraObject = Camera.main.transform;
     }
 
-    private void HandleMovement() 
+    public void HandleAllMovement()
+    {
+        HandleMovement();
+        HandleRotation();
+    }
+    private void HandleMovement()
     {
         moveDirection = cameraObject.forward * inputManager.verticalInput + cameraObject.right * inputManager.horizontalInput;
         moveDirection.y = 0;
@@ -29,14 +34,22 @@ public class PlayerMovement : MonoBehaviour
 
         playerRigidbody.linearVelocity = movementVelocity;
     }
-    void Start()
+
+    private void HandleRotation()
     {
-        
+        Vector3 targetDirection = Vector3.zero;
+
+        targetDirection = cameraObject.forward * inputManager.verticalInput + cameraObject.right * inputManager.horizontalInput;
+        targetDirection.y = 0;
+
+        targetDirection.Normalize();
+
+        if (targetDirection == Vector3.zero)
+            targetDirection = transform.forward;
+
+        Quaternion targetRotation = Quaternion.LookRotation(targetDirection);
+        Quaternion playerRotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
+        playerRigidbody.rotation = playerRotation;
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
 }
